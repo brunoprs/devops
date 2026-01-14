@@ -1,30 +1,43 @@
 import os
-import time
+import logging
 
-def create_temp_file(file_name):
-    with open(file_name, 'w') as file:
-        file.write(f"This is a temporary file created by DevOps process. Created at {time.ctime()}.\n")
+log_file = "devops_log.txt"
+logging.basicConfig(filename=log_file, level=logging.DEBUG, 
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
-def cleanup_temp_files():
-    files_to_cleanup = ['tmp_file1.txt', 'tmp_file2.log', 'tmp_file3.txt']
+def limpar_arquivos_temp():
+    logging.info("Iniciando a tarefa DevOps: Limpando arquivos temporários...")
+    arquivos = ["tmp_file1.txt", "tmp_file2.log"]
     
-    for file in files_to_cleanup:
-        if os.path.exists(file):
-            os.remove(file)
-            print(f"Arquivo {file} removido com sucesso.")
+    for arquivo in arquivos:
+        if os.path.exists(arquivo):
+            os.remove(arquivo)
+            logging.info(f"Arquivo {arquivo} removido.")
         else:
-            print(f"Arquivo {file} não encontrado.")
-
-def devops_task():
-    print(f"Log gerado em: {time.ctime()}")
+            logging.warning(f"Arquivo {arquivo} não encontrado.")
     
-    print("Iniciando a tarefa DevOps: Limpando arquivos temporários...")
-    cleanup_temp_files()
+    logging.info("Tarefa de limpeza concluída.")
 
-    print("Criando novos arquivos temporários...")
-    create_temp_file('tmp_file1.txt')
-    create_temp_file('tmp_file2.log')
-    create_temp_file('tmp_file3.txt')  
+def contar_arquivos_txt():
+    caminho = "./devops"
+    arquivos_txt = [f for f in os.listdir(caminho) if f.endswith('.txt')]
+    
+    if arquivos_txt:
+        logging.info(f"Arquivos .txt encontrados: {', '.join(arquivos_txt)}")
+    else:
+        logging.info("Nenhum arquivo .txt encontrado.")
+    
+    return len(arquivos_txt)
 
+def main():
+    logging.info("Iniciando o script DevOps...")
+    
+    limpar_arquivos_temp()
+    
+    total_txt = contar_arquivos_txt()
+    
+    logging.info(f"Total de arquivos .txt encontrados: {total_txt}")
+    logging.info("Execução do script concluída.")
+    
 if __name__ == "__main__":
-    devops_task()
+    main()
