@@ -3,6 +3,9 @@ import datetime
 import sys
 
 
+#DEVOPS - JENKINS
+
+
 def log_mensagem(mensagem):
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(f"{timestamp} - {mensagem}")
