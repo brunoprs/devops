@@ -3,7 +3,7 @@ import datetime
 import sys
 
 
-#DEVOPS - JENKINS
+#DEVOPS - JENKINS - CORREÇOES - TRIGGER CI
 
 
 def log_mensagem(mensagem):
