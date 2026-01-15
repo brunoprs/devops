@@ -8,10 +8,10 @@ def log_mensagem(mensagem):
     print(f"{timestamp} - {mensagem}")
 
 
-# Diretório base do projeto (onde o script está)
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Diretório para arquivos DevOps (criado automaticamente)
+
 DEVOPS_DIR = os.path.join(BASE_DIR, "devops_files")
 
 
