@@ -1,25 +1,22 @@
-name: DevOps Build and Deploy
+name: CI - DevOps Pipeline
 
 on:
   push:
-    branches:
-      - main 
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
-    runs-on: ubuntu-latest  
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2  
+      - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2  
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      - name: Run Python script
-        run: python devops.py  
-
-      - name: Push the changes (optional)
-        run: git push origin main  
+      - name: Run DevOps script
+        run: python devops.py
