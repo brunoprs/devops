@@ -1,29 +1,22 @@
-name: CI/CD - Deploy EC2
+name: CI - DevOps Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout do código
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Testar aplicação
-      run: |
-        python devops.py
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
 
-    - name: Deploy na EC2 via SSH
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ec2-user
-        key: ${{ secrets.EC2_SSH_KEY }}
-        script: |
-          cd devops
-          git pull origin main
-          chmod +x deploy.sh
-          ./deploy.sh
+      - name: Run DevOps script
+        run: python devops.py
