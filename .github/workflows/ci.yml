@@ -1,33 +1,22 @@
-#CI/CD
-
-name: CI/CD - DevOps Pipeline
+name: Teste SSH
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  deploy:
+  test-ssh:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout código
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Rodar testes
-        run: python -m unittest discover -s tests
-
-      - name: Deploy na EC2 via SSH
+      - name: Testar SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
+          username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          debug: true
           script: |
-            cd ~/devops
-            ./deploy.sh
+            echo "SSH OK"
+            whoami
+            hostname
