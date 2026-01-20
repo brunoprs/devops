@@ -28,8 +28,14 @@ def garantir_diretorio():
 
 def contar_arquivos_txt():
     arquivos_txt = [f for f in os.listdir(DEVOPS_DIR) if f.endswith('.txt')]
-    log_mensagem(f"Total de arquivos .txt encontrados: {len(arquivos_txt)}")
-    return len(arquivos_txt)
+    total = len(arquivos_txt)
+
+    log_mensagem(f"Total de arquivos .txt encontrados: {total}")
+
+    if total == 0:
+        raise Exception("Nenhum arquivo .txt encontrado! CI falhou.")
+
+    return total
 
 
 def limpar_arquivos_temp():
