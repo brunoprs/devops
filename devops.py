@@ -5,8 +5,6 @@ from datetime import datetime
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DEVOPS_DIR = os.path.join(BASE_DIR, "devops_files")
 
-# Em CI usamos DEVOPS_LOG_FILE=devops_test.log
-# Em runtime (EC2) cai no padrão /var/log/devops-pipeline.log
 LOG_FILE = os.getenv(
     "DEVOPS_LOG_FILE",
     "/var/log/devops-pipeline.log"
@@ -27,7 +25,6 @@ def log_mensagem(mensagem):
         with open(LOG_FILE, "a") as arquivo_log:
             arquivo_log.write(linha + "\n")
     except Exception as erro:
-        # Falha real de runtime (infra, permissão, disco, etc.)
         print(f"{timestamp} - FALHA DE RUNTIME AO ESCREVER LOG: {erro}")
         sys.exit(1)
 
@@ -99,3 +96,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# TESTE SIMULANDO FALHA
