@@ -20,9 +20,9 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Rodar testes (CI isolado de infra)
+      - name: Rodar testes
         run: |
-          export DEVOPS_LOG_FILE=devops_test.log
+          export DEVOPS_LOG_FILE=./devops.log
           python -m unittest discover -s tests
 
       - name: Debug Secrets
