@@ -2,6 +2,9 @@ import os
 import sys
 from datetime import datetime
 
+APP_ENV = os.getenv("APP_ENV", "dev").lower()
+ENABLE_ROLLBACK = os.getenv("ENABLE_ROLLBACK", "false").lower() == "true"
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DEVOPS_DIR = os.path.join(BASE_DIR, "devops_files")
 
@@ -10,23 +13,33 @@ LOG_FILE = os.getenv(
     "/var/log/devops-pipeline.log"
 )
 
-
-def log_mensagem(mensagem):
+def log_mensagem(mensagem, fatal=False):
     """
-    Registra logs no console e em arquivo.
-    Nunca quebra o CI por falha de log.
+    Registra logs.
+    - DEV: nunca quebra
+    - STAGE/PROD: quebra se fatal
     """
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    linha = f"{timestamp} - {mensagem}"
+    linha = f"{timestamp} - [{APP_ENV.upper()}] {mensagem}"
 
     print(linha)
 
     try:
         with open(LOG_FILE, "a") as arquivo_log:
             arquivo_log.write(linha + "\n")
-    except Exception as erro:
-        print(f"{timestamp} - LOG WARNING: {erro}")
 
+    except Exception as erro:
+        print(
+            f"{timestamp} - "
+            f"[{APP_ENV.upper()}] "
+            f"FALHA AO ESCREVER LOG: {erro}"
+        )
+
+        if APP_ENV in ("stage", "prod") and fatal:
+            print("HEALTHCHECK_FAIL")
+            sys.exit(1)
+
+        return
 
 def garantir_diretorio():
     if not os.path.exists(DEVOPS_DIR):
@@ -45,12 +58,6 @@ def contar_arquivos_txt():
 
     total = len(arquivos_txt)
     log_mensagem(f"Total de arquivos .txt encontrados: {total}")
-
-    if total == 0:
-        log_mensagem(
-            "Nenhum arquivo .txt encontrado. Pipeline continua sem falha."
-        )
-        return 0
 
     return total
 
@@ -71,7 +78,6 @@ def limpar_arquivos_temp():
                 f"Arquivo {arquivo} não encontrado, pulando..."
             )
 
-
 def main():
     log_mensagem("Iniciando tarefas DevOps (healthcheck runtime)...")
 
@@ -88,12 +94,11 @@ def main():
         print("HEALTHCHECK_OK")
 
     except Exception as erro:
-        log_mensagem(f"Erro inesperado durante execução: {erro}")
-        print("HEALTHCHECK_FAIL")
-        sys.exit(1)
+        log_mensagem(
+            f"Erro inesperado: {erro}",
+            fatal=True
+        )
 
 
 if __name__ == "__main__":
     main()
-
-
