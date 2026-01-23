@@ -2,16 +2,26 @@ import os
 import datetime
 import sys
 
-# DEVOPS - JENKINS - CI/CD - IMPLEMENTAÇÃO
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DEVOPS_DIR = os.path.join(BASE_DIR, "devops_files")
+LOG_FILE = os.path.join(BASE_DIR, "devops.log")
 
 
 def log_mensagem(mensagem):
+    """
+    Registra logs no console e em arquivo.
+    Esse arquivo será lido pelo CloudWatch Agent.
+    """
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print(f"{timestamp} - {mensagem}")
+    linha = f"{timestamp} - {mensagem}"
 
+    print(linha)
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DEVOPS_DIR = os.path.join(BASE_DIR, "devops_files")
+    try:
+        with open(LOG_FILE, "a") as f:
+            f.write(linha + "\n")
+    except Exception as e:
+        print(f"{timestamp} - ERRO AO ESCREVER LOG: {e}")
 
 
 def garantir_diretorio():
@@ -25,13 +35,12 @@ def garantir_diretorio():
 def contar_arquivos_txt():
     arquivos_txt = [
         f for f in os.listdir(DEVOPS_DIR)
-        if f.endswith('.txt')
+        if f.endswith(".txt")
     ]
 
     total = len(arquivos_txt)
     log_mensagem(f"Total de arquivos .txt encontrados: {total}")
 
-    # 🔹 REGRA AJUSTADA PARA CI
     if total == 0:
         log_mensagem(
             "Nenhum arquivo .txt encontrado. Continuando pipeline sem falha."
@@ -42,7 +51,7 @@ def contar_arquivos_txt():
 
 
 def limpar_arquivos_temp():
-    arquivos_temp = ['tmp_file1.txt', 'tmp_file2.log']
+    arquivos_temp = ["tmp_file1.txt", "tmp_file2.log"]
 
     log_mensagem("Iniciando limpeza de arquivos temporários...")
 
@@ -61,7 +70,6 @@ def main():
 
     try:
         garantir_diretorio()
-
         limpar_arquivos_temp()
 
         total_txt = contar_arquivos_txt()
