@@ -11,43 +11,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      
+
       - name: Checkout código
         uses: actions/checkout@v4
 
-      
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      
-      - name: Rodar testes
-        run: python -m unittest discover -s tests
+      - name: Rodar testes (CI isolado de infra)
+        run: |
+          export DEVOPS_LOG_FILE=devops_test.log
+          python -m unittest discover -s tests
 
-      
       - name: Debug Secrets
         run: |
           echo "EC2_HOST=${{ secrets.EC2_HOST }}"
           echo "EC2_USER=${{ secrets.EC2_USER }}"
-        
 
-      
       - name: Deploy na EC2 via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ec2-user              
-          key: ${{ secrets.EC2_SSH_KEY }} 
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           debug: true
           script: |
             echo "Conectado com sucesso!"
             cd /home/ec2-user/devops || exit 1
             ls -l
+
             # Garante permissão de execução
             if [ ! -x ./deploy.sh ]; then
               chmod +x ./deploy.sh
             fi
+
             echo "Rodando deploy.sh..."
             ./deploy.sh
