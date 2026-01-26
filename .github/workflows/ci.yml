@@ -1,5 +1,3 @@
-# CI/CD - Deploy na EC2
-
 name: CI/CD - DevOps Pipeline
 
 on:
@@ -9,9 +7,11 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        env: [dev, stage, prod]
 
     steps:
-
       - name: Checkout código
         uses: actions/checkout@v4
 
@@ -21,14 +21,7 @@ jobs:
           python-version: '3.x'
 
       - name: Rodar testes
-        run: |
-          export DEVOPS_LOG_FILE=./devops.log
-          python -m unittest discover -s tests
-
-      - name: Debug Secrets
-        run: |
-          echo "EC2_HOST=${{ secrets.EC2_HOST }}"
-          echo "EC2_USER=${{ secrets.EC2_USER }}"
+        run: python -m unittest discover -s tests
 
       - name: Deploy na EC2 via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -41,12 +34,11 @@ jobs:
           script: |
             echo "Conectado com sucesso!"
             cd /home/ec2-user/devops || exit 1
-            ls -l
-
-            # Garante permissão de execução
-            if [ ! -x ./deploy.sh ]; then
-              chmod +x ./deploy.sh
-            fi
-
-            echo "Rodando deploy.sh..."
-            ./deploy.sh
+            # Define ambiente
+            export ENV=${{ matrix.env }}
+            echo "Executando no ambiente: $ENV"
+            # Atualiza código
+            git fetch origin
+            git reset --hard origin/main
+            # Roda o app
+            python3 devops.py
