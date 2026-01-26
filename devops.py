@@ -2,6 +2,8 @@ import os
 import sys
 from datetime import datetime
 
+#DEV, STAGE E PROD
+
 ENV = os.getenv("ENV", "dev").lower()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
